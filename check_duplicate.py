@@ -25,15 +25,8 @@ class check_duplicate:
                 raise user_defined(i)
             visisted.add(self.input_array[i])    
         return True
-        
-if __name__ == "__main__":
-    # input format python ".\check_duplicate.py -N 6 -input_array 33 4 2 3 44 4"
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-N", help = "Enter the number of elements in list:", type = int)
-    parser.add_argument("-input_array",nargs="+", help = "Space seperated int values based on N", type = int)
-    args = parser.parse_args()
     
-    
+def main(args):
     while True:
         if args.N == len(args.input_array):
             # parsing args
@@ -42,14 +35,13 @@ if __name__ == "__main__":
                 # check if duplicate values exists
                 try:
                     ob.check_duplicate_value()
-                    val = ob.input_array
                     print(sorted(ob.input_array, reverse=True))
                     break
                 except user_defined as e:
                     ob.input_array.pop(e.value)
                     ob.N-=1
+                    print(e)
             break
-        
         else:
             # if arg parse fails
             print(f"Number of element not equal to the provided value for N = {args.N}")
@@ -58,3 +50,11 @@ if __name__ == "__main__":
                 args.input_array = list(map(int, input().split()))
             except Exception:
                 continue
+        
+if __name__ == "__main__":
+    # input format " python .\check_duplicate.py -N 6 -input_array 33 4 2 3 44 4"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-N", help = "Enter the number of elements in list:", type = int)
+    parser.add_argument("-input_array",nargs="+", help = "Space seperated int values based on N", type = int)
+    args = parser.parse_args()
+    main(args)
