@@ -26,7 +26,7 @@ class check_duplicate:
             visisted.add(self.input_array[i])    
         return True
     
-def main(args):
+def main_fun(args):
     while True:
         if args.N == len(args.input_array):
             # parsing args
@@ -57,4 +57,4 @@ if __name__ == "__main__":
     parser.add_argument("-N", help = "Enter the number of elements in list:", type = int)
     parser.add_argument("-input_array",nargs="+", help = "Space seperated int values based on N", type = int)
     args = parser.parse_args()
-    main(args)
+    main_fun(args)
