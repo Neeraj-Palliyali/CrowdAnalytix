@@ -1,12 +1,20 @@
+# For cli arguments
 import argparse
+# creating web requests
 import requests
+# For base64 encoding
 import base64
+# For file path
 import os
+# For creating buffer of memory for image
 from io import BytesIO
+# For returning JSON values
 import json
+# Pillow library for opening and manipulating images
 from PIL import Image
 
 
+# Creating human readble size of files
 def changeByte(size:int)-> str:
     byte = float(size)
     kb = float(1024)
@@ -25,7 +33,12 @@ def changeByte(size:int)-> str:
     elif tb<=size:
         return f"{size/tb:.2f} Tib"
 
+# Returning size, width, height and base64 encoded string(if exists)
 def saveAndReturnSize(img_object, getBase64=False)-> dict:
+    # Arguments 
+    # img_object : image object
+    # getBase64 : default false 
+
     res = {}
     buffer = BytesIO()
     img_object.save(buffer, format="PNG")
@@ -39,7 +52,7 @@ def saveAndReturnSize(img_object, getBase64=False)-> dict:
     w,h = img_object.size
     res['size'] = size
     res['width'] = w
-    res['hieght'] = h
+    res['height'] = h
     return res
 
 
@@ -59,12 +72,23 @@ if __name__ == "__main__":
             # getting details of original image
             original_image = saveAndReturnSize(im)
             result['original_size']=original_image['size']
-            result['original_resolution']=f"{original_image['width']} x {original_image['hieght']} pixels" 
+            result['original_resolution']=f"{original_image['width']} x {original_image['height']} pixels" 
         
-            # resizing to window 250X250
-            im.thumbnail((250,250))
+            ''' Resizing to window 250X250
+            # Takes the largest one from breath and height and finds the corresponding from the aspect ratio of actual image 
+            # and takes that and finds the alternative if height taken then width is found and vise versa 
+
+            -->Nearest Neighbour shrinking
+            # With help of shrinking factor we take the array value of bits that the images is represented by 
+            # and for each row element taken the factor is added onto the index so the whole image shrinks
+            # does the same for the coloumn
+            # For example if it is a 8x8 and needs to shrink to 4x4 we just take (0,0) (0,2) (0,4) (0,6) (2,0) (2,2) (2,4)
+            # and so on
+            '''
+            im.thumbnail((250,250), Image.NEAREST)
             resized_image = saveAndReturnSize(im, True)
-            result['thumbnail_resolution'] = f"{resized_image['width']} x {resized_image['hieght']} pixels"
+            im.show()
+            result['thumbnail_resolution'] = f"{resized_image['width']} x {resized_image['height']} pixels"
             result['thumbnail_size'] = resized_image['size']
 
             # saving the resized image 
@@ -79,7 +103,7 @@ if __name__ == "__main__":
             print(json.dumps(result))
         
         except Exception as e:
-            print("The image is not valid")
+            print("The image is not valid!!!!")
         
     except Exception:
-        print("Incorrect Url")
+        print("Incorrect Url!!!")
