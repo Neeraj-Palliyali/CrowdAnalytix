@@ -3,7 +3,7 @@ import requests
 import base64
 import os
 from io import BytesIO
-import sys
+import json
 from PIL import Image
 
 
@@ -15,54 +15,71 @@ def changeByte(size:int)-> str:
     tb = float(1024**4)
 
     if byte<kb:
-        return f"{size} Bytes"
+        return f"{size:.2f} Bytes"
     elif kb<= size < mb:
-        return f"{size/kb} Kib"
+        return f"{size/kb:.2f} Kib"
     elif mb<= size < gb:
-        return f"{size/mb} Mib"
+        return f"{size/mb:.2f} Mib"
     elif gb<= size < tb:
-        return f"{size/gb} Gib"
+        return f"{size/gb:.2f} Gib"
     elif tb<=size:
-        return f"{size/tb} Tib"
+        return f"{size/tb:.2f} Tib"
+
+def saveAndReturnSize(img_object, getBase64=False)-> dict:
+    res = {}
+    buffer = BytesIO()
+    img_object.save(buffer, format="PNG")
+    
+    if getBase64:
+        # The image is in the buffer
+        # This get's encoded ie ascii to bytes 
+        img_str = base64.b64encode(buffer.getvalue())
+        res['base'] = img_str
+    size = changeByte(buffer.tell())
+    w,h = img_object.size
+    res['size'] = size
+    res['width'] = w
+    res['hieght'] = h
+    return res
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("url",help = "Enter the url of image", type = str)
     args = parser.parse_args()
     flag = False
-    while flag == False:
+    
+    try:
+        result = {}
+        # To use an actual request 
+        response = requests.get(args.url)
         try:
-            result = {}
-            # To use an actual request 
-            response = requests.get(args.url)
-            img_details = BytesIO(response.content)
             # The response is in bytes so we need to utf encode 
-            im = Image.open(img_details)
-            im.save(img_details, format="PNG")
-            result['original_size']=changeByte(img_details.tell())
-            w,h = im.size
-            result['original_resolution']=f"{w} x {h}" 
+            im = Image.open(BytesIO(response.content))
+            # getting details of original image
+            original_image = saveAndReturnSize(im)
+            result['original_size']=original_image['size']
+            result['original_resolution']=f"{original_image['width']} x {original_image['hieght']} pixels" 
         
+            # resizing to window 250X250
             im.thumbnail((250,250))
-            # im.show()
-            buffered = BytesIO()
-            if im.mode != 'RGB':
-                im = im.convert('RGB')
-            im.save(buffered, format='JPEG')
-            im.save("image/thumbnail.jpg", format='JPEG')
-            result['tumbnail_path'] = os.getcwd()+"image\thumbnail.jpg"
-            size = buffered.tell()
-            w,h = im.size
-            result['thumbnail_resolution'] = f"{w} x {h}" 
-            result['thumbnail_size'] = changeByte(size) 
-            img_str = base64.b64encode(buffered.getvalue())
-            # result['thumbnail_base64'] = img_str
+            resized_image = saveAndReturnSize(im, True)
+            result['thumbnail_resolution'] = f"{resized_image['width']} x {resized_image['hieght']} pixels"
+            result['thumbnail_size'] = resized_image['size']
+
+            # saving the resized image 
+            im.save("image/thumbnail.jpg", format='PNG')
+            result['thumbnail_path'] = os.getcwd()+"image\thumbnail.jpg"
+
+            # base64 encrypted image in string 
+            if 'base' in resized_image:
+                result['thumbnail_base64'] = resized_image['base'].decode('utf-8')
             
-            flag = True
-            print(result)
-            
-            
+            # json Output
+            print(json.dumps(result))
+        
         except Exception as e:
-            print(e)
-            print("Incorrect Url")
-            args.url = input("Please enter a valid url:")
+            print("The image is not valid")
+        
+    except Exception:
+        print("Incorrect Url")
