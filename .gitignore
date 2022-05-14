@@ -1,1 +1,6 @@
+# virtual environment
 .env
+
+
+# data set file path
+data_set
