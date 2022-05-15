@@ -16,6 +16,7 @@ The first line contains T denoting the number of test cases. T test cases follow
 case contains a string S containing characters.
 
 ans:reverse_string.py
+
 run_command : python reverse_string.py
 
 Question 3
@@ -24,6 +25,7 @@ Question 3
 download it and get the following detail:
 
 ans:image_handling.py
+
 run_command : python image_handling.py https://www.google.com/logos/doodles/2021/uefa-euro-2020-6753651837109267-l.png
 
 Question 4
@@ -32,4 +34,5 @@ Question 4
 tasks:
 
 ans:data_handling.py
+
 run_command : python data_handling.py
