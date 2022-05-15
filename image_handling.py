@@ -57,6 +57,7 @@ def saveAndReturnSize(img_object, getBase64=False)-> dict:
 
 
 if __name__ == "__main__":
+    # python image_handling.py https://www.google.com/logos/doodles/2021/uefa-euro-2020-6753651837109267-l.png
     parser = argparse.ArgumentParser()
     parser.add_argument("url",help = "Enter the url of image", type = str)
     args = parser.parse_args()
@@ -87,7 +88,6 @@ if __name__ == "__main__":
             '''
             im.thumbnail((250,250), Image.NEAREST)
             resized_image = saveAndReturnSize(im, True)
-            im.show()
             result['thumbnail_resolution'] = f"{resized_image['width']} x {resized_image['height']} pixels"
             result['thumbnail_size'] = resized_image['size']
 

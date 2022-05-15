@@ -1,6 +1,9 @@
 # virtual environment
 .env
 
+# pychache
+__pycache__
+
 
 # data set file path
-data_set
+# data_set
